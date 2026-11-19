@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Birthday Surprise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#07122b; --navy:#0d2150; --royal:#1b3f8f; --sky:#6ec1ff; --ice:#d7efff; --flame:#ffd36e;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{background:linear-gradient(180deg,var(--night) 0%,var(--navy) 55%,#2a5aa8 100%);color:var(--ice);
+  font-family:'Quicksand',system-ui,sans-serif;overflow:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(60% 45% at 50% 55%,rgba(110,193,255,.22),transparent 70%)}
+.screen{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .7s ease}
+.screen.on{opacity:1;pointer-events:auto}
+h1{font-family:'Pacifico',cursive;font-weight:400;font-size:clamp(34px,8vw,64px);margin:0 0 8px;color:var(--ice);
+  text-shadow:0 0 24px rgba(110,193,255,.55)}
+p{margin:6px 0;font-size:clamp(15px,3.6vw,19px);line-height:1.5}
+button{font:700 17px 'Quicksand',sans-serif;color:var(--night);background:linear-gradient(180deg,var(--ice),var(--sky));
+  border:0;border-radius:999px;padding:14px 30px;cursor:pointer;box-shadow:0 8px 28px rgba(110,193,255,.35);
+  transition:transform .15s}
+button:hover{transform:scale(1.05)} button:active{transform:scale(.97)}
+button:focus-visible{outline:3px solid var(--flame);outline-offset:3px}
+button.ghost{background:none;color:var(--sky);box-shadow:none;font-size:15px;text-decoration:underline;padding:10px}
+
+/* Screen 1: gift */
+.gift{position:relative;width:150px;height:140px;margin:0 auto 28px;cursor:pointer;animation:bob 2.2s ease-in-out infinite;touch-action:manipulation}
+.gift .box{position:absolute;bottom:0;width:150px;height:96px;background:var(--royal);border-radius:8px;
+  box-shadow:inset 0 -10px 0 rgba(0,0,0,.2)}
+.gift .lid{position:absolute;bottom:90px;left:-8px;width:166px;height:34px;background:var(--sky);border-radius:8px;
+  transform-origin:left bottom;transition:transform .9s cubic-bezier(.5,-.4,.4,1.2),opacity .9s}
+.gift .rib{position:absolute;bottom:0;left:64px;width:22px;height:124px;background:var(--ice)}
+.gift.open .lid{transform:translateY(-70px) rotate(-35deg);opacity:0}
+.gift.open{animation:none}
+@keyframes bob{50%{transform:translateY(-10px)}}
+
+/* Screen 2: animated mocha cake */
+.cake{position:relative;width:min(300px,82vw);height:245px;margin:0 auto 10px;display:flex;align-items:flex-end;justify-content:center;animation:cakeBob 2.4s ease-in-out infinite}
+.mocha-cake{position:relative;width:230px;height:155px;margin-bottom:10px;filter:drop-shadow(0 13px 12px rgba(0,0,0,.24))}
+.cake-top{position:absolute;left:8px;top:24px;width:214px;height:55px;border-radius:50%;background:linear-gradient(180deg,#9a6244,#70432f);border:5px solid #d8ad86;z-index:3}
+.cake-body{position:absolute;left:8px;top:48px;width:214px;height:91px;border-radius:0 0 25px 25px;background:linear-gradient(90deg,#633a2b,#986044 24%,#75452f 72%,#4d2c23);border-bottom:9px solid #42251f;z-index:2;overflow:hidden}
+.cake-body:before{content:"";position:absolute;inset:8px 0 auto;height:12px;background:repeating-linear-gradient(90deg,#d8ad86 0 7px,#a87555 7px 14px);opacity:.8}
+.cake-drip{position:absolute;left:10px;top:47px;width:210px;height:35px;z-index:4;pointer-events:none;background:radial-gradient(ellipse 12px 18px at 12% 0,#4a2922 98%,transparent 100%),radial-gradient(ellipse 11px 22px at 34% 0,#4a2922 98%,transparent 100%),radial-gradient(ellipse 13px 17px at 58% 0,#4a2922 98%,transparent 100%),radial-gradient(ellipse 10px 21px at 82% 0,#4a2922 98%,transparent 100%)}
+.cream{position:absolute;top:10px;z-index:5;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3d9,#e6c6a2 70%);box-shadow:0 3px 0 #c89e78}
+.cream:nth-child(1){left:34px}.cream:nth-child(2){left:77px;top:0}.cream:nth-child(3){left:119px;top:3px}.cream:nth-child(4){left:163px;top:10px}
+.choco{position:absolute;z-index:6;top:9px;width:13px;height:22px;border-radius:3px;background:linear-gradient(90deg,#3d211c,#855038,#3d211c);transform:rotate(24deg)}
+.choco.one{left:61px}.choco.two{left:143px;top:3px;transform:rotate(-28deg)}
+.candle{position:absolute;z-index:8;left:calc(50% - 5px);top:-24px;width:10px;height:47px;border-radius:4px;background:repeating-linear-gradient(135deg,#f7dfb6 0 7px,#8dbde7 7px 13px);box-shadow:0 0 0 1px rgba(65,39,28,.2)}
+.flame{position:absolute;z-index:9;left:calc(50% - 7px);top:-47px;width:14px;height:23px;border-radius:60% 40% 55% 45%;background:radial-gradient(ellipse at 50% 70%,#fff7bd 0 20%,#ffd15f 42%,#ff8b35 75%);transform-origin:50% 100%;animation:flick .18s infinite alternate;filter:drop-shadow(0 0 8px rgba(255,190,80,.7));transition:opacity .4s,transform .4s}
+@keyframes flick{from{transform:scale(1,1) rotate(-5deg)}to{transform:scale(.88,1.12) rotate(5deg)}}
+@keyframes cakeBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.out .flame{opacity:0;transform:scale(.2) translateY(-20px);animation:none}
+.smoke{position:absolute;z-index:10;left:calc(50% - 2px);top:-47px;width:5px;height:18px;border-radius:50%;background:rgba(230,235,245,.65);opacity:0}
+.out .smoke{animation:smoke 1.8s ease-out}
+@keyframes smoke{0%{opacity:.8;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-40px) scale(4)}}
+#hint{min-height:28px;margin-top:14px;color:var(--sky)}
+#next{margin-top:12px;display:none}
+
+/* Screen 3: message */
+.card{position:relative;z-index:3;max-width:520px;background:rgba(13,33,80,.72);border:1px solid rgba(110,193,255,.35);border-radius:22px;
+  padding:30px 26px;backdrop-filter:blur(6px);max-height:78vh;overflow-y:auto;text-align:left}
+.card h2{font-family:'Pacifico',cursive;font-weight:400;font-size:clamp(26px,6vw,36px);margin:0 0 14px;text-align:center;color:var(--ice)}
+.card p{white-space:pre-line;font-size:clamp(15px,3.5vw,17px);line-height:1.65;margin-bottom:14px}
+.sign{margin-top:18px;text-align:right;font-family:'Pacifico',cursive;color:var(--sky)}
+.note{margin-top:14px;font-size:14px;color:var(--sky);display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+#audioStatus{font-size:12px;color:#ffb4b4;width:100%;text-align:center;min-height:16px}
+
+/* Password screen */
+.lock{max-width:360px}
+.lock input{width:100%;font:600 18px 'Quicksand',sans-serif;text-align:center;color:var(--ice);background:rgba(13,33,80,.8);
+  border:2px solid rgba(110,193,255,.5);border-radius:14px;padding:14px;margin:16px 0 12px;outline:none}
+.lock input:focus{border-color:var(--sky);box-shadow:0 0 0 4px rgba(110,193,255,.25)}
+.lock .hint{color:var(--sky);font-style:italic}
+#err{min-height:24px;color:#ffb4b4;font-size:15px}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+#confetti{position:fixed;inset:0;z-index:5;pointer-events:none}
+#float{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* cake pop-in */
+.screen.on .cake{animation:pop .9s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{from{transform:scale(.6) translateY(30px);opacity:0}to{transform:none;opacity:1}}
+
+/* balloons */
+.balloon{position:fixed;bottom:-150px;z-index:4;width:46px;height:58px;border-radius:50% 50% 48% 48%;pointer-events:none;
+  animation:rise 8s ease-in forwards,sway 2s ease-in-out infinite alternate}
+.balloon::after{content:"";position:absolute;left:50%;top:100%;width:1.5px;height:70px;background:rgba(215,239,255,.55)}
+@keyframes rise{to{translate:0 -135vh}}
+@keyframes sway{from{transform:translateX(-14px) rotate(-5deg)}to{transform:translateX(14px) rotate(5deg)}}
+
+/* message fade-in */
+.para{opacity:0;animation:fadeUp .9s ease forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.gift,.flame,.balloon,.screen.on .cake{animation:none}.balloon{display:none}.para{opacity:1;animation:none}}
+
+/* Blue background details and floating pets */
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(215,239,255,.16) 0 2px,transparent 3px),
+    radial-gradient(circle at 84% 26%,rgba(110,193,255,.18) 0 3px,transparent 4px),
+    radial-gradient(circle at 22% 78%,rgba(215,239,255,.13) 0 2px,transparent 3px),
+    radial-gradient(circle at 76% 82%,rgba(110,193,255,.16) 0 3px,transparent 4px);
+  background-size:120px 120px,170px 170px,145px 145px,190px 190px;
+}
+.pets{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.pet{position:absolute;opacity:.30;filter:drop-shadow(0 4px 10px rgba(0,0,0,.18));user-select:none;animation:petFloat 7s ease-in-out infinite}
+.pet:nth-child(1){left:5%;top:17%;font-size:34px;animation-delay:-1s}
+.pet:nth-child(2){right:7%;top:22%;font-size:39px;animation-delay:-3s}
+.pet:nth-child(3){left:8%;bottom:17%;font-size:31px;animation-delay:-4s}
+.pet:nth-child(4){right:8%;bottom:14%;font-size:36px;animation-delay:-2s}
+.pet:nth-child(5){left:48%;top:8%;font-size:23px;opacity:.18;animation-delay:-5s}
+.pet:nth-child(6){right:34%;bottom:7%;font-size:25px;opacity:.18;animation-delay:-2.5s}
+@keyframes petFloat{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-13px) rotate(5deg)}}
+.password-title{max-width:560px;font-size:clamp(23px,5.3vw,38px);line-height:1.25;margin:0 auto 8px}
+@media (prefers-reduced-motion:reduce){.pet{animation:none}}
+</style>
+</head>
+<body>
+<div class="pets" aria-hidden="true"><span class="pet">🐶</span><span class="pet">🐱</span><span class="pet">🐾</span><span class="pet">🐕</span><span class="pet">🐾</span><span class="pet">🐈</span></div>
+<canvas id="float"></canvas>
+<canvas id="confetti"></canvas>
+
+<!-- Audio files (keep in the exact same folder as this HTML file) -->
+<audio id="hbdAudio" src="FINAL HBD.m4a" preload="auto"></audio>
+<audio id="msgAudio" src="only-exception.mp3" autoplay loop preload="auto"></audio>
+
+<!-- 1. The opening -->
+<section class="screen on" id="s1">
+  <div class="gift" id="gift" role="button" tabindex="0" aria-label="Open the gift">
+    <div class="box"></div><div class="rib"></div><div class="lid"></div>
+  </div>
+  <h1>I made you something</h1>
+  <p>Tap the gift to open it</p>
+</section>
+
+<!-- 2. The cake -->
+<section class="screen" id="s2">
+  <h1 id="title">Make a wish</h1>
+  <div class="cake" id="cake" role="img" aria-label="An animated mocha birthday cake with a candle">
+    <div class="mocha-cake">
+      <div class="cake-top"></div>
+      <div class="cake-body"></div>
+      <div class="cake-drip"></div>
+      <span class="cream"></span><span class="cream"></span><span class="cream"></span><span class="cream"></span>
+      <span class="choco one"></span><span class="choco two"></span>
+      <span class="candle"></span>
+      <span class="flame"></span>
+      <span class="smoke"></span>
+    </div>
+  </div>
+  <p id="hint">Here's a little mocha cake surprise for you</p>
+  <button class="ghost" id="tapblow">Continue</button>
+  <button id="next">Open my message</button>
+</section>
+
+<!-- 2.5 The password -->
+<section class="screen" id="sp">
+  <div class="lock" id="lock">
+    <h1 class="password-title">Wag Kang mag kakamali sa password, iiyak ako Dwayne Zion talaga</h1>
+    <p>Type the password to open your message</p>
+    <input id="pw" type="password" placeholder="Password" autocomplete="off" aria-label="Password">
+    <p class="hint" id="hintText"></p>
+    <div id="err"></div>
+    <button id="unlock">Unlock</button>
+  </div>
+</section>
+
+<!-- 3. The birthday message -->
+<section class="screen" id="s3">
+  <div class="card">
+    <h2 id="mTitle"></h2>
+    <div id="mBody"></div>
+    <div class="sign" id="mSign"></div>
+    <div class="note">
+      <span>♪</span>
+      <button type="button" class="ghost" id="mute">Pause music</button>
+      <div id="audioStatus"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+(() => {
+  const PASSWORD = "082206";
+  const HINT_TEXT = "birthday ni dyosa";
+  const MESSAGE_TITLE = "Happy Birthday, Dwayne Zion!!";
+  const MESSAGE_PARAGRAPHS = [
+    "I know this isn't much hehe, but I just want you to know how much I appreciate you. I'm genuinely grateful that you came into my life. Who would've expected that, right? Super unexpected talaga hehe. And ang bilis ng panahon, wym, how many months na and we're still here? It's honestly nice to look back and realize how far we've come since we first got to know each other.",
+    "I don't even know if I'll be able to give this to you exactly at 12 AM because I'm still learning about this kind of stuff, and I really don't want to be late ihh. Sorry na agad if medyo late ;p. I actually wanted everything to be ready on time because I want you to feel special today, even in my own little way.",
+    "I'm sorry na wala pa akong maibigay na something more for you, kaya naisip kong gumawa ng ganito. I just wanted to have something that I could give you, something that would remind you that today isn't just an ordinary day. I want you to know that there's someone who's genuinely looking forward to your birthday and is happy to celebrate another year of your life. I may not have the biggest or fanciest gift, but I hope you can feel how much thought and effort I put into this. Simple lang siya, but yk, galing 'to sa puso ko.",
+    "And ayan na nga, yung mocha cake na gusto mo!! I hope you like it hehehe. Nahipan mo ba? Did you make a wish? I hope whatever you wished for comes true. You deserve so many good things, and I hope this year brings you more reasons to smile, more opportunities, and a lot of good memories.",
+    "I hope you never forget how appreciated you are, not just today but even on ordinary days. I hope life treats you kindly, and whenever things get difficult, I hope you find the strength to get through them. Yk naman na here lang me always for you, okay? I wish you happiness that stays, people who genuinely care about you, and more little things that make your days better.",
+    "Thank you for coming into my life and for being someone I get to know and appreciate. Thank you for the conversations, the laughs, and even the random little moments. You might not realize it, but those things mean a lot to me. I'm happy that our paths crossed, and I hope we get to make more memories together.",
+    "And thank you for being patient sa akin, even if madali akong magalit sa ML hehe. I know naman na very busy talaga ako nitong mga nakaraan, and even hanggang today. I'm sorry if I haven't been able to give you as much time as I wanted to. Babawi me hehe. And I'm also sorry if I couldn't meet you kahit gustong-gusto ko. I just want to assure you na I really do want to see you. It's just that, yk, ayaw naman nila na umalis ako dito, kaya kahit gusto kitang makasama, hindi talaga gano'n kadali. I hope you understand. Kaya wait for me, okay? I really hope we'll get that chance soon.",
+    "Anyway, I hope you enjoy your day, okay? Don't forget to treat yourself and enjoy every little moment because today is all about you!! Happy birthday once again, Dwayne! I hope this new chapter of your life will be filled with good things and experiences that will make you happy. You deserve all the happiness in the world. Always take care of yourself, and please stay the way you are.",
+    "Enjoy your day, birthday boy!! Hehe. I hope you liked my little surprise. I'm really glad that I got to celebrate your birthday, even in my own little way. Happy birthday ulit!!"
+  ];
+  const MESSAGE_SIGN = "With all my heart";
+
+  const screens = {
+    s1: document.getElementById("s1"),
+    s2: document.getElementById("s2"),
+    sp: document.getElementById("sp"),
+    s3: document.getElementById("s3")
+  };
+
+  function showScreen(id) {
+    Object.values(screens).forEach(el => el && el.classList.remove("on"));
+    if (screens[id]) screens[id].classList.add("on");
+  }
+
+  // Audio setup
+  const hbdAudio = document.getElementById("hbdAudio");
+  const msgAudio = document.getElementById("msgAudio");
+  const muteBtn = document.getElementById("mute");
+  const audioStatus = document.getElementById("audioStatus");
+  let activeAudio = null;
+  let pendingMsgAutoplay = false;
+
+  // Keep msgAudio paused until the message screen unlocks
+  msgAudio.pause();
+
+  function playTrack(audioEl, isMessageTrack = false) {
+    audioStatus.textContent = "";
+    pendingMsgAutoplay = false;
+
+    [hbdAudio, msgAudio].forEach(track => {
+      if (track !== audioEl) {
+        track.pause();
+        track.currentTime = 0;
+      }
+    });
+
+    activeAudio = audioEl;
+    activeAudio.volume = 0.8;
+    activeAudio.currentTime = 0;
+
+    if (activeAudio.readyState === 0) {
+      activeAudio.load();
+    }
+
+    const playPromise = activeAudio.play();
+    if (playPromise && typeof playPromise.then === "function") {
+      playPromise.then(() => {
+        muteBtn.textContent = "Pause music";
+        audioStatus.textContent = "";
+      }).catch(() => {
+        muteBtn.textContent = "Resume music";
+        if (isMessageTrack) {
+          pendingMsgAutoplay = true;
+          audioStatus.textContent = "Tap anywhere on the message or 'Resume music' to start The Only Exception.";
+        } else {
+          audioStatus.textContent = "Check that FINAL HBD.m4a is in the same folder and not muted.";
+        }
+      });
+    }
+  }
+
+  // If browser blocked autoplay on s3, start on next tap inside s3
+  screens.s3.addEventListener("pointerdown", () => {
+    if (!pendingMsgAutoplay) return;
+    pendingMsgAutoplay = false;
+    msgAudio.play().then(() => {
+      muteBtn.textContent = "Pause music";
+      audioStatus.textContent = "";
+    }).catch(() => {});
+  }, { passive: true });
+
+  msgAudio.addEventListener("error", () => {
+    audioStatus.textContent = "Could not load only-exception.mp3 — check exact filename & folder.";
+  });
+
+  muteBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    pendingMsgAutoplay = false;
+    if (!msgAudio.paused) {
+      msgAudio.pause();
+      muteBtn.textContent = "Resume music";
+    } else {
+      msgAudio.volume = 0.8;
+      msgAudio.play().then(() => {
+        muteBtn.textContent = "Pause music";
+        audioStatus.textContent = "";
+      }).catch(() => {
+        audioStatus.textContent = "Unable to play only-exception.mp3.";
+      });
+    }
+  });
+
+  // Confetti canvas setup
+  const confettiCanvas = document.getElementById("confetti");
+  const ctx = confettiCanvas.getContext("2d");
+  let particles = [];
+  let animId = null;
+
+  function resizeCanvas() {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener("resize", resizeCanvas);
+
+  function launchConfetti() {
+    const colors = ["#6ec1ff", "#d7efff", "#ffd36e", "#ff8b35", "#9be7ff"];
+    particles = Array.from({ length: 85 }, () => ({
+      x: Math.random() * confettiCanvas.width,
+      y: -20 - Math.random() * 120,
+      w: 6 + Math.random() * 6,
+      h: 4 + Math.random() * 5,
+      vx: (Math.random() - 0.5) * 3,
+      vy: 2 + Math.random() * 4,
+      rot: Math.random() * Math.PI * 2,
+      vRot: (Math.random() - 0.5) * 0.15,
+      color: colors[Math.floor(Math.random() * colors.length)]
+    }));
+
+    if (animId) cancelAnimationFrame(animId);
+    const start = performance.now();
+
+    function tick(now) {
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vRot;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      particles = particles.filter(p => p.y < confettiCanvas.height + 30);
+      if (particles.length > 0 && now - start < 4500) {
+        animId = requestAnimationFrame(tick);
+      } else {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      }
+    }
+    animId = requestAnimationFrame(tick);
+  }
+
+  // Screen 1: Gift tap / keyboard handler
+  const gift = document.getElementById("gift");
+  let giftOpened = false;
+
+  function openGift() {
+    if (giftOpened) return;
+    giftOpened = true;
+    gift.classList.add("open");
+    launchConfetti();
+    setTimeout(() => {
+      showScreen("s2");
+    }, 650);
+  }
+
+  gift.addEventListener("click", openGift);
+  gift.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openGift();
+    }
+  });
+
+  // Screen 2: Cake & candle
+  const cake = document.getElementById("cake");
+  const tapBlow = document.getElementById("tapblow");
+  const nextBtn = document.getElementById("next");
+  const hint = document.getElementById("hint");
+
+  tapBlow.addEventListener("click", () => {
+    cake.classList.add("out");
+    hint.textContent = "Wish made! Ready for your message?";
+    tapBlow.style.display = "none";
+    nextBtn.style.display = "inline-block";
+    playTrack(hbdAudio, false);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    document.getElementById("hintText").textContent = HINT_TEXT;
+    showScreen("sp");
+    setTimeout(() => document.getElementById("pw").focus(), 100);
+  });
+
+  // Screen 2.5: Password unlock
+  const pwInput = document.getElementById("pw");
+  const unlockBtn = document.getElementById("unlock");
+  const errEl = document.getElementById("err");
+  const lockBox = document.getElementById("lock");
+
+  function renderMessage() {
+    document.getElementById("mTitle").textContent = MESSAGE_TITLE;
+    const bodyEl = document.getElementById("mBody");
+    bodyEl.innerHTML = "";
+    MESSAGE_PARAGRAPHS.forEach((text, i) => {
+      const p = document.createElement("p");
+      p.className = "para";
+      p.style.animationDelay = `${Math.min(i * 0.14, 0.9)}s`;
+      p.textContent = text;
+      bodyEl.appendChild(p);
+    });
+    document.getElementById("mSign").textContent = MESSAGE_SIGN;
+  }
+
+  function checkPassword() {
+    const val = pwInput.value.trim();
+    if (val === PASSWORD) {
+      errEl.textContent = "";
+      renderMessage();
+      launchConfetti();
+      showScreen("s3");
+      playTrack(msgAudio, true);
+    } else {
+      errEl.textContent = "Wrong password! Try again.";
+      lockBox.classList.remove("shake");
+      void lockBox.offsetWidth;
+      lockBox.classList.add("shake");
+    }
+  }
+
+  unlockBtn.addEventListener("click", checkPassword);
+  pwInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") checkPassword();
+  });
+})();
+</script>
+</body>
+</html>
